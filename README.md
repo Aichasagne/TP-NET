@@ -6,7 +6,7 @@
 
 ## URLs de production
 - **TodoApi** : https://todoapi-p9om.onrender.com
-- **BooksApi** : https://booksapi-f8w7.onrender.com
+- **BooksApi** : https://booksapi-v2.onrender.com
 
 ---
 
@@ -22,6 +22,7 @@ cd TodoApi
 dotnet run --launch-profile https
 ```
 Accéder à : http://localhost:5270/api/todoitems
+Swagger : http://localhost:5270/swagger
 
 ---
 
@@ -40,7 +41,12 @@ Accéder à : http://localhost:5182/api/books
 ```bash
 cd BooksApi
 docker build -t booksapi .
-docker run -p 8080:8080 booksapi
+docker run -p 8080:8080 \
+  -e "BookStoreDatabase__ConnectionString=VOTRE_CONNECTION_STRING" \
+  -e "JwtSettings__Secret=VOTRE_SECRET" \
+  -e "JwtSettings__Issuer=BooksApi" \
+  -e "JwtSettings__Audience=BooksApiUsers" \
+  booksapi
 ```
 
 ### TodoApi
@@ -67,21 +73,21 @@ docker run -p 8081:8080 todoapi
 
 ### Étape 1 — Créer un compte Admin
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/auth/register-admin \
+curl -X POST https://booksapi-v2.onrender.com/api/auth/register-admin \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","email":"admin@test.com","password":"Admin123!"}'
 ```
 
 ### Étape 2 — Créer un compte User
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/auth/register \
+curl -X POST https://booksapi-v2.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"user1","email":"user1@test.com","password":"User123!"}'
 ```
 
 ### Étape 3 — Se connecter et obtenir un token
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/auth/login \
+curl -X POST https://booksapi-v2.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"Admin123!"}'
 ```
@@ -98,7 +104,7 @@ Réponse :
 
 #### Ajouter un livre (Admin seulement)
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/books \
+curl -X POST https://booksapi-v2.onrender.com/api/books \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer VOTRE_TOKEN" \
   -d '{"bookName":"Clean Code","price":29.99,"category":"Programming","author":"Robert Martin"}'
@@ -106,12 +112,12 @@ curl -X POST https://booksapi-f8w7.onrender.com/api/books \
 
 #### Lire les livres (public)
 ```bash
-curl https://booksapi-f8w7.onrender.com/api/books
+curl https://booksapi-v2.onrender.com/api/books
 ```
 
 #### Tester le refus d'accès (User essaie de POST)
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/books \
+curl -X POST https://booksapi-v2.onrender.com/api/books \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer TOKEN_USER" \
   -d '{"bookName":"Test","price":10,"category":"Test","author":"Test"}'
@@ -120,7 +126,7 @@ curl -X POST https://booksapi-f8w7.onrender.com/api/books \
 
 #### Sans token (essai de POST)
 ```bash
-curl -X POST https://booksapi-f8w7.onrender.com/api/books \
+curl -X POST https://booksapi-v2.onrender.com/api/books \
   -H "Content-Type: application/json" \
   -d '{"bookName":"Test","price":10,"category":"Test","author":"Test"}'
 ```
